@@ -12,7 +12,7 @@ jobs:
       packages: write
     env:
       GHCR_REGISTRY: ghcr.io
-      IMAGE: veliall/web
+      IMAGE: Veliall/web
 
     steps:
       - uses: actions/checkout@v2
