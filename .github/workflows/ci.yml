@@ -15,7 +15,7 @@ jobs:
       IMAGE: Veliall/web
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v1
       - name: Push to GitHub Packages
         uses: docker/build-push-action@v2
         with:
