@@ -36,7 +36,6 @@ public class FrontServlet extends HttpServlet {
     } catch (Exception e) {
       e.printStackTrace();
       ErrorController.internalServerError(req, resp);
-      // TODO: handle
     }
   }
 

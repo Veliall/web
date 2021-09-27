@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
 import jakarta.servlet.annotation.ServletSecurity;
-import jakarta.servlet.annotation.WebListener;
 import org.example.app.handler.CardHandler;
 import org.example.app.handler.UserHandler;
 import org.example.app.repository.CardRepository;
@@ -26,51 +25,53 @@ import static org.example.framework.http.Methods.*;
 
 @ServletSecurity
 public class ServletContextLoadDestroyListener implements ServletContextListener {
-  @Override
-  public void contextInitialized(ServletContextEvent sce) {
-    ServletContextListener.super.contextInitialized(sce);
-    try {
-      final var context = sce.getServletContext();
+    @Override
+    public void contextInitialized(ServletContextEvent sce) {
+        ServletContextListener.super.contextInitialized(sce);
+        try {
+            final var context = sce.getServletContext();
 
-      final var initialContext = new InitialContext();
-      final var dataSource = ((DataSource) initialContext.lookup("java:/comp/env/jdbc/db"));
-      final var jdbcTemplate = new JdbcTemplate(dataSource);
-      context.setAttribute(ContextAttributes.JDBC_TEMPLATE_ATTR, jdbcTemplate);
+            final var initialContext = new InitialContext();
+            final var dataSource = ((DataSource) initialContext.lookup("java:/comp/env/jdbc/db"));
+            final var jdbcTemplate = new JdbcTemplate(dataSource);
+            context.setAttribute(ContextAttributes.JDBC_TEMPLATE_ATTR, jdbcTemplate);
 
-      final var gson = new Gson();
+            final var gson = new Gson();
 
-      final var userRepository = new UserRepository(jdbcTemplate);
-      final var passwordEncoder = new Argon2PasswordEncoder();
-      final var keyGenerator = new Base64StringKeyGenerator(64);
-      final var userService = new UserService(userRepository, passwordEncoder, keyGenerator);
-      context.setAttribute(ContextAttributes.AUTH_PROVIDER_ATTR, userService);
-      context.setAttribute(ContextAttributes.ANON_PROVIDER_ATTR, userService);
-      final var userHandler = new UserHandler(userService, gson);
+            final var userRepository = new UserRepository(jdbcTemplate);
+            final var passwordEncoder = new Argon2PasswordEncoder();
+            final var keyGenerator = new Base64StringKeyGenerator(64);
+            final var userService = new UserService(userRepository, passwordEncoder, keyGenerator);
+            context.setAttribute(ContextAttributes.AUTH_PROVIDER_ATTR, userService);
+            context.setAttribute(ContextAttributes.ANON_PROVIDER_ATTR, userService);
+            final var userHandler = new UserHandler(userService, gson);
 
-      final var cardRepository = new CardRepository(jdbcTemplate);
-      final var cardService = new CardService(cardRepository);
-      final var cardHandler = new CardHandler(cardService, gson);
+            final var cardRepository = new CardRepository(jdbcTemplate);
+            final var cardService = new CardService(cardRepository);
+            final var cardHandler = new CardHandler(cardService, gson);
 
-      final var routes = Map.<Pattern, Map<String, Handler>>of(
-          Pattern.compile("/cards.getAll"), Map.of(GET, cardHandler::getAll),
-          Pattern.compile("/cards.getById"), Map.of(GET, cardHandler::getById),
-          Pattern.compile("/cards.order"), Map.of(POST, cardHandler::order),
-          Pattern.compile("/cards.blockById"), Map.of(DELETE, cardHandler::blockById),
-          Pattern.compile("^/rest/cards/(?<cardId>\\d+)$"), Map.of(GET, cardHandler::getById),
-          Pattern.compile("^/rest/users/register$"), Map.of(POST, userHandler::register),
-          Pattern.compile("^/rest/users/login$"), Map.of(POST, userHandler::login)
-      );
-      context.setAttribute(ContextAttributes.ROUTES_ATTR, routes);
+            final var routes = Map.<Pattern, Map<String, Handler>>of(
+                    Pattern.compile("^/users/cards/getAll$"), Map.of(GET, cardHandler::getAll),
+                    Pattern.compile("^/users/cards/getAll/(?<userId>\\d+)$"), Map.of(GET, cardHandler::getAllById),
+                    Pattern.compile("^/users/cards/order$"), Map.of(GET, cardHandler::order),
+                    Pattern.compile("^/users/cards/blockById/(?<cardId>\\d+)$"), Map.of(DELETE, cardHandler::blockById),
+                    Pattern.compile("^/users/cards/(?<cardId>\\d+)$"), Map.of(GET, cardHandler::getById),
+                    Pattern.compile("^/users/cards/(?<cardId>\\d+)/transaction$"), Map.of(POST, cardHandler::transaction),
+                    Pattern.compile("^/users/register$"), Map.of(POST, userHandler::register),
+                    Pattern.compile("^/users/login$"), Map.of(POST, userHandler::login),
+                    Pattern.compile("^/users/passRecovery/(?<username>[a-zA-Z0-9]*)$"), Map.of(GET, userHandler::recoveryRequest),
+                    Pattern.compile("^/users/passRecovery"), Map.of(POST, userHandler::recovery)
+            );
+            context.setAttribute(ContextAttributes.ROUTES_ATTR, routes);
 
-    } catch (Exception e) {
-      e.printStackTrace();
-      throw new ContextInitializationException(e);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new ContextInitializationException(e);
+        }
     }
-  }
 
-  @Override
-  public void contextDestroyed(ServletContextEvent sce) {
-    ServletContextListener.super.contextDestroyed(sce);
-    // TODO: init dependencies
-  }
+    @Override
+    public void contextDestroyed(ServletContextEvent sce) {
+        ServletContextListener.super.contextDestroyed(sce);
+    }
 }

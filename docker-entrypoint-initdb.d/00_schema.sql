@@ -8,20 +8,21 @@ CREATE TABLE users
 );
 CREATE TABLE tokens
 (
-    token    TEXT PRIMARY KEY,
+    token         TEXT PRIMARY KEY,
+    "userId"      BIGINT      NOT NULL REFERENCES users,
+    created       timestamptz NOT NULL DEFAULT current_timestamp,
+    "endLifeTime" timestamptz NOT NULL DEFAULT current_timestamp + interval '600 second'
+);
+CREATE TABLE roles
+(
     "userId" BIGINT      NOT NULL REFERENCES users,
+    role     BIGINT      NOT NULL DEFAULT 2,
     created  timestamptz NOT NULL DEFAULT current_timestamp
 );
-CREATE TABLE registration_attempts
+CREATE TABLE recovery_password
 (
-    id       BIGSERIAL PRIMARY KEY,
     username TEXT        NOT NULL UNIQUE,
-    created  timestamptz NOT NULL DEFAULT current_timestamp
-);
-CREATE TABLE login_attempts
-(
-    id       BIGSERIAL PRIMARY KEY,
-    username TEXT        NOT NULL UNIQUE,
+    code     BIGINT      NOT NULL,
     created  timestamptz NOT NULL DEFAULT current_timestamp
 );
 CREATE TABLE cards

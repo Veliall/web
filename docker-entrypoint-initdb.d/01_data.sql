@@ -13,3 +13,15 @@ VALUES (1, 1, '**** *888', 50000),
        (2, 2, '**** *999', 90000);
 
 ALTER SEQUENCE cards_id_seq RESTART WITH 3;
+
+INSERT INTO tokens(token, "userId", "endLifeTime")
+VALUES ('1NSb+2kcdKF44ut4iBu+dm6YLu6pakWapvxHtxqaPgMr5iRhox/HlhBerAZMILPjwnRtXms+zDfVTLCsao9nuw==',
+        2,
+        current_timestamp - interval '1 hour');
+
+INSERT INTO roles("userId", role)
+VALUES (1, 1);
+
+INSERT INTO roles("userId")
+VALUES (1),
+       (2);

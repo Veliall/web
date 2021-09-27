@@ -1,7 +1,16 @@
 ###
 
-https://server.local:8443/cards.getAll
-Authorization: 6NSb+2kcdKF44ut4iBu+dm6YLu6pakWapvxHtxqaPgMr5iRhox/HlhBerAZMILPjwnRtXms+zDfVTLCsao9nuw==
+https://server.dev:8443/users/cards/getAll
+Authorization:6NSb+2kcdKF44ut4iBu+dm6YLu6pakWapvxHtxqaPgMr5iRhox/HlhBerAZMILPjwnRtXms+zDfVTLCsao9nuw==
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+});
+%}
+###
+https://server.dev:8443/users/cards/getAll
+Authorization: 1NSb+2kcdKF44ut4iBu+dm6YLu6pakWapvxHtxqaPgMr5iRhox/HlhBerAZMILPjwnRtXms+zDfVTLCsao9nuw==
 
 > {%
 client.test("Request executed successfully", function() {
@@ -10,7 +19,56 @@ client.test("Request executed successfully", function() {
 %}
 
 ###
-POST https://server.local:8443/rest/users/register
+
+https://server.dev:8443/users/cards/getAll/2
+Authorization: 6NSb+2kcdKF44ut4iBu+dm6YLu6pakWapvxHtxqaPgMr5iRhox/HlhBerAZMILPjwnRtXms+zDfVTLCsao9nuw==
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+});
+%}
+###
+
+
+https://server.dev:8443/users/cards/getAll
+Cookie:token=6NSb+2kcdKF44ut4iBu+dm6YLu6pakWapvxHtxqaPgMr5iRhox/HlhBerAZMILPjwnRtXms+zDfVTLCsao9nuw==
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+});
+%}
+
+###
+https://server.dev:8443/users/cards/1
+Authorization:6NSb+2kcdKF44ut4iBu+dm6YLu6pakWapvxHtxqaPgMr5iRhox/HlhBerAZMILPjwnRtXms+zDfVTLCsao9nuw==
+
+###
+
+https://server.dev:8443/users/cards/getAll
+Authorization:Basic 6NSb+2kcdKF44ut4iBu+dm6YLu6pakWapvxHtxqaPgMr5iRhox/HlhBerAZMILPjwnRtXms+zDfVTLCsao9nuw==
+
+###
+
+https://server.dev:8443/users/cards/order
+Authorization: 6NSb+2kcdKF44ut4iBu+dm6YLu6pakWapvxHtxqaPgMr5iRhox/HlhBerAZMILPjwnRtXms+zDfVTLCsao9nuw==
+
+###
+DELETE https://server.dev:8443/users/cards/blockById/1
+Authorization:6NSb+2kcdKF44ut4iBu+dm6YLu6pakWapvxHtxqaPgMr5iRhox/HlhBerAZMILPjwnRtXms+zDfVTLCsao9nuw==
+###
+DELETE https://server.dev:8443/users/cards/blockById/2
+Authorization:6NSb+2kcdKF44ut4iBu+dm6YLu6pakWapvxHtxqaPgMr5iRhox/HlhBerAZMILPjwnRtXms+zDfVTLCsao9nuw==
+###
+DELETE https://server.dev:8443/users/cards/blockById/1
+###
+
+https://server.dev:8443/users/cards/order
+
+###
+
+POST https://server.dev:8443/users/register
 Content-Type: application/json
 
 {
@@ -27,7 +85,7 @@ client.test("Request executed successfully", function() {
 
 ###
 
-https://server.local:8443/cards.getAll
+https://server.dev:8443/users/cards/getAll
 Authorization: {{registration_token}}
 
 > {%
@@ -38,12 +96,12 @@ client.test("Request executed successfully", function() {
 
 ###
 
-POST https://server.local:8443/rest/users/login
+POST https://server.dev:8443/users/login
 Content-Type: application/json
 
 {
-  "username": "student",
-  "password": "qwery123"
+  "username": "admin",
+  "password": "newpass"
 }
 
 > {%
@@ -55,7 +113,7 @@ client.test("Request executed successfully", function() {
 
 ###
 
-https://server.local:8443/cards.getAll
+https://server.dev:8443/users/cards/getAll
 Authorization: {{login_token}}
 
 > {%
@@ -63,3 +121,32 @@ client.test("Request executed successfully", function() {
   client.assert(response.status === 200, "Response status is not 200");
 });
 %}
+
+###
+
+POST https://server.dev:8443/users/cards/1/transaction
+Authorization: 6NSb+2kcdKF44ut4iBu+dm6YLu6pakWapvxHtxqaPgMr5iRhox/HlhBerAZMILPjwnRtXms+zDfVTLCsao9nuw==
+Content-Type: application/json
+
+{
+  "addresseeCardId": 3,
+  "sum": 10000
+}
+
+###
+GET https://server.dev:8443/users/passRecovery/admin
+
+###
+
+POST https://server.dev:8443/users/passRecovery
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "newpass",
+  "code": 598403
+}
+
+###
+https://server.dev:8443/users/cards/getAll
+Authorization:Basic YWRtaW46bmV3cGFzcw==

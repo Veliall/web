@@ -9,7 +9,6 @@ public class UserHelper {
   private UserHelper() {
   }
 
-  // TODO: beautify
   public static User getUser(HttpServletRequest req) {
     return ((User) ((Authentication) req.getAttribute(RequestAttributes.AUTH_ATTR)).getPrincipal());
   }
