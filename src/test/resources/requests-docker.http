@@ -3,42 +3,20 @@
 https://server.dev:8443/users/cards/getAll
 Authorization:6NSb+2kcdKF44ut4iBu+dm6YLu6pakWapvxHtxqaPgMr5iRhox/HlhBerAZMILPjwnRtXms+zDfVTLCsao9nuw==
 
-> {%
-client.test("Request executed successfully", function() {
-  client.assert(response.status === 200, "Response status is not 200");
-});
-%}
 ###
 https://server.dev:8443/users/cards/getAll
 Authorization: 1NSb+2kcdKF44ut4iBu+dm6YLu6pakWapvxHtxqaPgMr5iRhox/HlhBerAZMILPjwnRtXms+zDfVTLCsao9nuw==
-
-> {%
-client.test("Request executed successfully", function() {
-  client.assert(response.status === 200, "Response status is not 200");
-});
-%}
 
 ###
 
 https://server.dev:8443/users/cards/getAll/2
 Authorization: 6NSb+2kcdKF44ut4iBu+dm6YLu6pakWapvxHtxqaPgMr5iRhox/HlhBerAZMILPjwnRtXms+zDfVTLCsao9nuw==
 
-> {%
-client.test("Request executed successfully", function() {
-  client.assert(response.status === 200, "Response status is not 200");
-});
-%}
 ###
 
 
 https://server.dev:8443/users/cards/getAll
 Cookie:token=6NSb+2kcdKF44ut4iBu+dm6YLu6pakWapvxHtxqaPgMr5iRhox/HlhBerAZMILPjwnRtXms+zDfVTLCsao9nuw==
-
-> {%
-client.test("Request executed successfully", function() {
-  client.assert(response.status === 200, "Response status is not 200");
-});
-%}
 
 ###
 https://server.dev:8443/users/cards/1
@@ -55,9 +33,11 @@ https://server.dev:8443/users/cards/order
 Authorization: 6NSb+2kcdKF44ut4iBu+dm6YLu6pakWapvxHtxqaPgMr5iRhox/HlhBerAZMILPjwnRtXms+zDfVTLCsao9nuw==
 
 ###
+
 DELETE https://server.dev:8443/users/cards/blockById/1
 Authorization:6NSb+2kcdKF44ut4iBu+dm6YLu6pakWapvxHtxqaPgMr5iRhox/HlhBerAZMILPjwnRtXms+zDfVTLCsao9nuw==
 ###
+
 DELETE https://server.dev:8443/users/cards/blockById/2
 Authorization:6NSb+2kcdKF44ut4iBu+dm6YLu6pakWapvxHtxqaPgMr5iRhox/HlhBerAZMILPjwnRtXms+zDfVTLCsao9nuw==
 ###
@@ -76,23 +56,10 @@ Content-Type: application/json
   "password": "password"
 }
 
-> {%
-client.test("Request executed successfully", function() {
-  client.assert(response.status === 200, "Response status is not 200");
-  client.global.set("registration_token", response.body.token);
-});
-%}
-
 ###
 
 https://server.dev:8443/users/cards/getAll
 Authorization: {{registration_token}}
-
-> {%
-client.test("Request executed successfully", function() {
-  client.assert(response.status === 200, "Response status is not 200");
-});
-%}
 
 ###
 
@@ -104,23 +71,10 @@ Content-Type: application/json
   "password": "newpass"
 }
 
-> {%
-client.test("Request executed successfully", function() {
-  client.assert(response.status === 200, "Response status is not 200");
-  client.global.set("login_token", response.body.token);
-});
-%}
-
 ###
 
 https://server.dev:8443/users/cards/getAll
 Authorization: {{login_token}}
-
-> {%
-client.test("Request executed successfully", function() {
-  client.assert(response.status === 200, "Response status is not 200");
-});
-%}
 
 ###
 
