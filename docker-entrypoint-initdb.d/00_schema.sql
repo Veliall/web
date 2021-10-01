@@ -16,7 +16,7 @@ CREATE TABLE tokens
 CREATE TABLE roles
 (
     "userId" BIGINT      NOT NULL REFERENCES users,
-    role     BIGINT      NOT NULL DEFAULT 2,
+    role     TEXT        NOT NULL DEFAULT 'client',
     created  timestamptz NOT NULL DEFAULT current_timestamp
 );
 CREATE TABLE recovery_password

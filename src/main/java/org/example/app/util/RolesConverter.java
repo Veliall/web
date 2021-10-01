@@ -8,12 +8,12 @@ import java.util.List;
 public class RolesConverter {
     private RolesConverter(){}
 
-    public static List<String> readRoles(Integer[] roles) {
+    public static List<String> readRoles(String[] roles) {
         final var result = new ArrayList<String>();
-        for (int role : roles) {
+        for (String role : roles) {
             switch (role) {
-                case 1 -> result.add(Roles.ROLE_ADMIN);
-                case 2 -> result.add(Roles.ROLE_CLIENT);
+                case "admin" -> result.add(Roles.ROLE_ADMIN);
+                case "client" -> result.add(Roles.ROLE_CLIENT);
             }
         }
         return result;

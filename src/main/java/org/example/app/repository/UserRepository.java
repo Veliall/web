@@ -6,9 +6,7 @@ import org.example.app.domain.UserWithPassword;
 import org.example.jdbc.JdbcTemplate;
 import org.example.jdbc.RowMapper;
 
-import java.lang.reflect.Array;
 import java.util.Date;
-import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -26,8 +24,8 @@ public class UserRepository {
     private final RowMapper<Integer> rowMapperCode = resultSet -> resultSet.getInt("code");
     private final RowMapper<String> rowMapperToken = resultSet -> resultSet.getString("token");
     private final RowMapper<Date> rowMapperTime = resultSet -> resultSet.getTimestamp("endLifeTime");
-    private final RowMapper<Integer[]> rowMapperRoles = resultSet -> new Integer[] {
-            resultSet.getInt("role")
+    private final RowMapper<String[]> rowMapperRoles = resultSet -> new String[]{
+            resultSet.getString("role")
     };
 
     public Optional<User> getByUsername(String username) {
@@ -152,7 +150,7 @@ public class UserRepository {
         );
     }
 
-    public Optional<Integer[]> getRoles(long id) {
+    public Optional<String[]> getRoles(long id) {
         // language=PostgreSQL
         return jdbcTemplate.queryOne(
                 "SELECT role FROM roles WHERE \"userId\" = ?",

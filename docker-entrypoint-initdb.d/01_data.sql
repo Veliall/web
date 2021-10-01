@@ -20,7 +20,7 @@ VALUES ('1NSb+2kcdKF44ut4iBu+dm6YLu6pakWapvxHtxqaPgMr5iRhox/HlhBerAZMILPjwnRtXms
         current_timestamp - interval '1 hour');
 
 INSERT INTO roles("userId", role)
-VALUES (1, 1);
+VALUES (1, 'admin');
 
 INSERT INTO roles("userId")
 VALUES (1),
