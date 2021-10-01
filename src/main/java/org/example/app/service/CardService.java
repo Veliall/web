@@ -35,8 +35,11 @@ public class CardService {
             throw new CardNotFoundException();
         }
 
-        if (card.getBalance() < sum || sum < 0) {
-            throw new UnsupportedTransactionException();
+        if (card.getBalance() < sum) {
+            throw new UnsupportedTransactionException("Not enough money");
+        }
+        if (sum <= 0) {
+            throw new UnsupportedTransactionException("Incorrect amount");
         }
 
         cardRepository.transaction(cardId, addressee, sum);
