@@ -74,7 +74,7 @@ public class UserService implements AuthenticationProvider, AnonymousProvider {
         return new LoginResponseDto(saved.getId(), saved.getUsername(), token);
     }
 
-    public String recoveryRequest(String username) {
+    public RecoveryResponseDto recoveryRequest(String username) {
         final var user = repository.getByUsername(username)
                 .orElseThrow(UserNotFoundException::new);
 
@@ -89,7 +89,7 @@ public class UserService implements AuthenticationProvider, AnonymousProvider {
             repository.recoveryUpdate(username, code);
         }
 
-        return "Подтвердите код, для смены пароля";
+        return new RecoveryResponseDto(username, "Подтвердите код, для смены пароля");
 
     }
 
