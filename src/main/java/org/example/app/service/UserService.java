@@ -14,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
+import java.time.Instant;
 import java.util.Base64;
 import java.util.Date;
 import java.util.List;
@@ -116,7 +117,7 @@ public class UserService implements AuthenticationProvider, AnonymousProvider {
     public boolean tokenIsAlive(String token) {
         final var endTime = repository.getTokenEndLifeTime(token).orElseThrow(AuthenticationException::new);
 
-        return endTime.getTime() - new Date().getTime() >= 0;
+        return endTime.toInstant().isAfter(Instant.now());
     }
 
     public List<String> getRoles(long id) {
