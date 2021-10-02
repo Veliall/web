@@ -9,6 +9,7 @@ import org.example.app.dto.TransferRequestDto;
 import org.example.app.exception.IllegalCardAccessException;
 import org.example.app.exception.UserNotFoundException;
 import org.example.app.service.CardService;
+import org.example.app.util.CardHelper;
 import org.example.app.util.UserHelper;
 import org.example.framework.attribute.RequestAttributes;
 import org.example.framework.security.Authentication;
@@ -36,10 +37,8 @@ public class CardHandler { // Servlet -> Controller -> Service (domain) -> domai
 
     public void getAllById(HttpServletRequest req, HttpServletResponse resp) {
         try {
-            final var userId = Long.parseLong(((Matcher) req.getAttribute(RequestAttributes.PATH_MATCHER_ATTR))
-                    .group("userId"));
-            final var auth = ((Authentication) req.getAttribute(RequestAttributes.AUTH_ATTR))
-                    .getAuthorities();
+            final var userId = UserHelper.getUserId(req);
+            final var auth = UserHelper.getAuthorities(req);
             final var user = UserHelper.getUser(req);
 
             if (auth.contains(Roles.ROLE_ADMIN) || user.getId() == userId) {
@@ -55,10 +54,8 @@ public class CardHandler { // Servlet -> Controller -> Service (domain) -> domai
     }
 
     public void getById(HttpServletRequest req, HttpServletResponse resp) {
-        final var cardId = Long.parseLong(((Matcher) req.getAttribute(RequestAttributes.PATH_MATCHER_ATTR))
-                .group("cardId"));
-        final var auth = ((Authentication) req.getAttribute(RequestAttributes.AUTH_ATTR))
-                .getAuthorities();
+        final var cardId = CardHelper.getCardId(req);
+        final var auth = UserHelper.getAuthorities(req);
         final var user = UserHelper.getUser(req);
 
         if (auth.isEmpty() || auth.contains(Roles.ROLE_ANONYMOUS)) {
@@ -77,8 +74,7 @@ public class CardHandler { // Servlet -> Controller -> Service (domain) -> domai
     }
 
     public void order(HttpServletRequest req, HttpServletResponse resp) {
-        final var auth = ((Authentication) req.getAttribute(RequestAttributes.AUTH_ATTR))
-                .getAuthorities();
+        final var auth = UserHelper.getAuthorities(req);
         if (auth.isEmpty() || auth.contains(Roles.ROLE_ANONYMOUS)) {
             throw new UserNotFoundException("Unsupported option for anonymous users");
         }
@@ -95,10 +91,8 @@ public class CardHandler { // Servlet -> Controller -> Service (domain) -> domai
 
     public void blockById(HttpServletRequest req, HttpServletResponse resp) {
         try {
-            final var cardId = Long.parseLong(((Matcher) req.getAttribute(RequestAttributes.PATH_MATCHER_ATTR))
-                    .group("cardId"));
-            final var auth = ((Authentication) req.getAttribute(RequestAttributes.AUTH_ATTR))
-                    .getAuthorities();
+            final long cardId = CardHelper.getCardId(req);
+            final var auth = UserHelper.getAuthorities(req);
             final var user = UserHelper.getUser(req);
 
             if (auth.contains(Roles.ROLE_ADMIN) || user.getId() == service.getOwnerId(cardId)) {
@@ -117,8 +111,7 @@ public class CardHandler { // Servlet -> Controller -> Service (domain) -> domai
 
     public void transaction(HttpServletRequest req, HttpServletResponse resp) {
         try {
-            final var cardId = Long.parseLong(((Matcher) req.getAttribute(RequestAttributes.PATH_MATCHER_ATTR))
-                    .group("cardId"));
+            final var cardId = CardHelper.getCardId(req);
             final var user = UserHelper.getUser(req);
             final var requestDto = gson.fromJson(req.getReader(), TransferRequestDto.class);
             final var responseDto = service.transfer(cardId, user, requestDto);
