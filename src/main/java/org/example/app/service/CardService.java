@@ -28,10 +28,10 @@ public class CardService {
         }
 
         final var card = cardRepository.getById(cardId).get();
-        final var addressee = requestDto.getAddresseeCardId();
+        final var addressee = requestDto.getAddresseeNumber();
         final var sum = requestDto.getSum();
 
-        if (cardRepository.getById(addressee).isEmpty()) {
+        if (cardRepository.getByNumber(addressee).isEmpty()) {
             throw new CardNotFoundException();
         }
 

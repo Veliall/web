@@ -2,10 +2,10 @@ package org.example.app.domain;
 
 public class Card {
   private long id;
-  private String number;
+  private long number;
   private long balance;
 
-  public Card(long id, String number, long balance) {
+  public Card(long id, long number, long balance) {
     this.id = id;
     this.number = number;
     this.balance = balance;
@@ -19,11 +19,11 @@ public class Card {
     this.id = id;
   }
 
-  public String getNumber() {
+  public long getNumber() {
     return number;
   }
 
-  public void setNumber(String number) {
+  public void setNumber(long number) {
     this.number = number;
   }
 

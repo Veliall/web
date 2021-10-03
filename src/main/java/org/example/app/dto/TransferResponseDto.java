@@ -3,13 +3,12 @@ package org.example.app.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.example.app.domain.User;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
 public class TransferResponseDto {
   private long cardId;
-  private String number;
+  private long number;
   private long balance;
 }

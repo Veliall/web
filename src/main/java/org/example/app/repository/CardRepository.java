@@ -13,10 +13,11 @@ public class CardRepository {
     private final JdbcTemplate jdbcTemplate;
     private final RowMapper<Card> cardRowMapper = resultSet -> new Card(
             resultSet.getLong("id"),
-            resultSet.getString("number"),
+            resultSet.getLong("number"),
             resultSet.getLong("balance")
     );
     private final RowMapper<Long> cardIdRowMapper = resultSet -> resultSet.getLong("ownerId");
+    private final RowMapper<Long> cardNumberRowMapper = resultSet -> resultSet.getLong("number");
     private final RowMapper<Boolean> cardActiveRowMapper = resultSet -> resultSet.getBoolean("active");
 
     public List<Card> getAllByOwnerId(long ownerId) {
@@ -37,18 +38,27 @@ public class CardRepository {
         );
     }
 
-    public void transaction(long cardId, int addressee, int sum) {
+    public Optional<Card> getByNumber(long number) {
+        // language=PostgreSQL
+        return jdbcTemplate.queryOne(
+                "SELECT id, number, balance FROM cards WHERE number = ? AND active = TRUE",
+                cardRowMapper,
+                number
+        );
+    }
+
+    public void transaction(long cardId, long addresseeNumber, int sum) {
+        // language=PostgreSQL
+        jdbcTemplate.update(
+                "UPDATE cards SET balance = balance + ? WHERE number = ? AND active = TRUE",
+                sum,
+                addresseeNumber
+        );
         // language=PostgreSQL
         jdbcTemplate.update(
                 "UPDATE cards SET balance = balance - ? WHERE id = ? AND active = TRUE",
                 sum,
                 cardId
-        );
-        // language=PostgreSQL
-        jdbcTemplate.update(
-                "UPDATE cards SET balance = balance + ? WHERE id = ? AND active = TRUE",
-                sum,
-                addressee
         );
     }
 

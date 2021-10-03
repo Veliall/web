@@ -29,7 +29,7 @@ CREATE TABLE cards
 (
     id        BIGSERIAL PRIMARY KEY,
     "ownerId" BIGINT  NOT NULL REFERENCES users,
-    number    TEXT    NOT NULL,
+    number    BIGINT  NOT NULL UNIQUE,
     balance   BIGINT  NOT NULL DEFAULT 0,
     active    BOOLEAN NOT NULL DEFAULT TRUE
 );
