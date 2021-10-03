@@ -33,7 +33,7 @@ public class TokenAuthenticationFilter extends HttpFilter {
     }
 
     final var token = req.getHeader("Authorization");
-    if (token == null) {
+    if (token == null || token.startsWith("Basic")) {
       super.doFilter(req, res, chain);
       return;
     }

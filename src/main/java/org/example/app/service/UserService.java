@@ -11,15 +11,9 @@ import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.security.crypto.keygen.StringKeyGenerator;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.time.Instant;
-import java.util.Base64;
-import java.util.Date;
 import java.util.List;
-import java.util.Optional;
-import java.util.regex.Pattern;
 
 @RequiredArgsConstructor
 public class UserService implements AuthenticationProvider, AnonymousProvider {
@@ -29,10 +23,30 @@ public class UserService implements AuthenticationProvider, AnonymousProvider {
 
     @Override
     public Authentication authenticate(Authentication authentication) {
-        final var principal = (String) authentication.getPrincipal();
-        return principal.startsWith("Basic") ?
-                authenticationByBasic(authentication) : authenticationByToken(authentication);
+        final var token = (String) authentication.getPrincipal();
+        if (!tokenIsAlive(token)) {
+            throw new TokenInvalidException();
+        }
+        repository.updateTokenLifeTime(token);
+
+        return repository.findByToken(token)
+                .map(o -> new TokenAuthentication(o, null, getRoles(o.getId()), true))
+                .orElseThrow(AuthenticationException::new);
     }
+
+    @Override
+    public Authentication authenticate(String username, String password) throws AuthenticationException {
+        final var userWithPassword =
+                repository.getByUsernameWithPassword(username)
+                        .orElseThrow(UserNotFoundException::new);
+
+        if (!passwordEncoder.matches(password, userWithPassword.getPassword())) {
+            throw new PasswordNotMatchesException();
+        }
+        final var user = repository.getByUsername(username).orElseThrow(UserNotFoundException::new);
+        return new BasicAuthentication(user, null, getRoles(user.getId()), true);
+    }
+
 
     @Override
     public AnonymousAuthentication provide() {
@@ -123,42 +137,5 @@ public class UserService implements AuthenticationProvider, AnonymousProvider {
     public List<String> getRoles(long id) {
         final var roles = repository.getRoles(id).orElseThrow(UserNotFoundException::new);
         return RolesConverter.readRoles(roles);
-    }
-
-    private Authentication authenticationByBasic(Authentication authentication) {
-        final var authenticationPrincipal = (String) authentication.getPrincipal();
-        final var schemaAndEncodeData = authenticationPrincipal.split(" ");
-        if (schemaAndEncodeData.length != 2) {
-            throw new WrongLoginAndPassException();
-        }
-
-        final var loginAndPass = new String(Base64.getDecoder().decode(schemaAndEncodeData[1]));
-        final var split = loginAndPass.split(":");
-        if (split.length != 2) {
-            throw new WrongLoginAndPassException();
-        }
-
-        final var username = split[0];
-        final var password = split[1];
-        final var userWithPassword = repository.getByUsernameWithPassword(username)
-                .orElseThrow(UserNotFoundException::new);
-
-        if (!passwordEncoder.matches(password, userWithPassword.getPassword())) {
-            throw new PasswordNotMatchesException();
-        }
-        final var user = repository.getByUsername(username).orElseThrow(UserNotFoundException::new);
-        return new BasicAuthentication(user, null, getRoles(user.getId()), true);
-    }
-
-    private Authentication authenticationByToken(Authentication authentication) {
-        final var token = (String) authentication.getPrincipal();
-        if (!tokenIsAlive(token)) {
-            throw new TokenInvalidException();
-        }
-        repository.updateTokenLifeTime(token);
-
-        return repository.findByToken(token)
-                .map(o -> new TokenAuthentication(o, null, getRoles(o.getId()), true))
-                .orElseThrow(AuthenticationException::new);
     }
 }

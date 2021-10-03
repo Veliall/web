@@ -9,14 +9,12 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.example.app.exception.WrongLoginAndPassException;
 import org.example.framework.attribute.ContextAttributes;
 import org.example.framework.attribute.RequestAttributes;
-import org.example.framework.security.*;
+import org.example.framework.security.AuthenticationException;
+import org.example.framework.security.AuthenticationProvider;
 import org.example.framework.util.FilterHelper;
 
 import java.io.IOException;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.util.Base64;
-import java.util.regex.Pattern;
 
 public class BasicAuthenticationFilter extends HttpFilter {
     private AuthenticationProvider provider;
@@ -36,8 +34,8 @@ public class BasicAuthenticationFilter extends HttpFilter {
         }
 
         final var auth = req.getHeader("Authorization");
-        if (auth == null || !auth.startsWith("Basic")){
-          super.doFilter(req, res, chain);
+        if (auth == null || !auth.startsWith("Basic")) {
+            super.doFilter(req, res, chain);
             return;
         }
 
@@ -57,7 +55,7 @@ public class BasicAuthenticationFilter extends HttpFilter {
 
         try {
             final var authentication = provider.authenticate
-                    (new BasicAuthentication(principal, credentials));
+                    (principal, credentials);
             req.setAttribute(RequestAttributes.AUTH_ATTR, authentication);
         } catch (AuthenticationException e) {
             res.sendError(401);
