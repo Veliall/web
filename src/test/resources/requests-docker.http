@@ -83,7 +83,7 @@ Authorization: 6NSb+2kcdKF44ut4iBu+dm6YLu6pakWapvxHtxqaPgMr5iRhox/HlhBerAZMILPjw
 Content-Type: application/json
 
 {
-  "addresseeCardId": 3,
+  "addresseeNumber": 5555666677778888,
   "sum": 10000
 }
 
@@ -98,7 +98,7 @@ Content-Type: application/json
 {
   "username": "admin",
   "password": "newpass",
-  "code": 598403
+  "code": 506292
 }
 
 ###

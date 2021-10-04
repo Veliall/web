@@ -5,10 +5,7 @@ import org.example.app.domain.Card;
 import org.example.app.domain.User;
 import org.example.app.dto.TransferRequestDto;
 import org.example.app.dto.TransferResponseDto;
-import org.example.app.exception.CardNotFoundException;
-import org.example.app.exception.IllegalCardAccessException;
-import org.example.app.exception.UnsupportedTransactionException;
-import org.example.app.exception.UserNotFoundException;
+import org.example.app.exception.*;
 import org.example.app.repository.CardRepository;
 import org.example.framework.security.Roles;
 
@@ -47,10 +44,10 @@ public class CardService {
         }
 
         if (card.getBalance() < sum) {
-            throw new UnsupportedTransactionException("Not enough money");
+            throw new NotEnoughMoneyException();
         }
         if (sum <= 0) {
-            throw new UnsupportedTransactionException("Incorrect amount");
+            throw new IncorrectAmountException();
         }
 
         cardRepository.transaction(cardId, addressee, sum);
