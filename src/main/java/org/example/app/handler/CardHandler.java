@@ -6,17 +6,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.example.app.dto.TransferRequestDto;
-import org.example.app.exception.IllegalCardAccessException;
-import org.example.app.exception.UserNotFoundException;
 import org.example.app.service.CardService;
 import org.example.app.util.CardHelper;
 import org.example.app.util.UserHelper;
-import org.example.framework.attribute.RequestAttributes;
-import org.example.framework.security.Authentication;
-import org.example.framework.security.Roles;
 
 import java.io.IOException;
-import java.util.regex.Matcher;
 
 @Log
 @RequiredArgsConstructor
@@ -36,51 +30,39 @@ public class CardHandler { // Servlet -> Controller -> Service (domain) -> domai
     }
 
     public void getAllById(HttpServletRequest req, HttpServletResponse resp) {
+        final var userId = UserHelper.getUserId(req);
+        final var auth = UserHelper.getAuthorities(req);
+        final var user = UserHelper.getUser(req);
         try {
-            final var userId = UserHelper.getUserId(req);
-            final var auth = UserHelper.getAuthorities(req);
-            final var user = UserHelper.getUser(req);
-
-            if (auth.contains(Roles.ROLE_ADMIN) || user.getId() == userId) {
-                final var data = service.getAllByOwnerId(userId);
-                resp.setHeader("Content-Type", "application/json");
-                resp.getWriter().write(gson.toJson(data));
-            } else {
-                throw new IllegalCardAccessException();
-            }
+            final var data = service.getAllByOwnerId(userId, auth, user);
+            resp.setHeader("Content-Type", "application/json");
+            resp.getWriter().write(gson.toJson(data));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
     }
 
     public void getById(HttpServletRequest req, HttpServletResponse resp) {
         final var cardId = CardHelper.getCardId(req);
         final var auth = UserHelper.getAuthorities(req);
         final var user = UserHelper.getUser(req);
-
-        if (auth.isEmpty() || auth.contains(Roles.ROLE_ANONYMOUS)) {
-            throw new UserNotFoundException("Unsupported option for anonymous users");
-        }
-
-        if (auth.contains(Roles.ROLE_ADMIN) || user.getId() == service.getOwnerId(cardId)) {
-            final var card = service.getById(cardId);
+        try {
+            final var card = service.getById(cardId, auth, user);
             resp.setHeader("Content-Type", "application/json");
-            try {
-                resp.getWriter().write(gson.toJson(card));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            resp.getWriter().write(gson.toJson(card));
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
+
     public void order(HttpServletRequest req, HttpServletResponse resp) {
         final var auth = UserHelper.getAuthorities(req);
-        if (auth.isEmpty() || auth.contains(Roles.ROLE_ANONYMOUS)) {
-            throw new UserNotFoundException("Unsupported option for anonymous users");
-        }
+
         try {
             final var user = UserHelper.getUser(req);
-            final var newCard = service.order(user.getId());
+            final var newCard = service.order(user.getId(), auth);
             resp.setHeader("Content-Type", "application/json");
             resp.getWriter().write(gson.toJson(newCard));
         } catch (IOException e) {
@@ -90,20 +72,13 @@ public class CardHandler { // Servlet -> Controller -> Service (domain) -> domai
     }
 
     public void blockById(HttpServletRequest req, HttpServletResponse resp) {
+        final long cardId = CardHelper.getCardId(req);
+        final var auth = UserHelper.getAuthorities(req);
+        final var user = UserHelper.getUser(req);
         try {
-            final long cardId = CardHelper.getCardId(req);
-            final var auth = UserHelper.getAuthorities(req);
-            final var user = UserHelper.getUser(req);
-
-            if (auth.contains(Roles.ROLE_ADMIN) || user.getId() == service.getOwnerId(cardId)) {
-                final var active = service.blockById(cardId);
-                if (!active) {
-                    resp.setHeader("Content-Type", "text/plain");
-                    resp.getWriter().write("Карта успешно заблокирована");
-                }
-            } else {
-                throw new IllegalCardAccessException();
-            }
+            final var result = service.blockById(cardId, auth, user);
+            resp.setHeader("Content-Type", "text/plain");
+            resp.getWriter().write(gson.toJson(result));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

@@ -18,7 +18,6 @@ public class CardRepository {
     );
     private final RowMapper<Long> cardIdRowMapper = resultSet -> resultSet.getLong("ownerId");
     private final RowMapper<Long> cardNumberRowMapper = resultSet -> resultSet.getLong("number");
-    private final RowMapper<Boolean> cardActiveRowMapper = resultSet -> resultSet.getBoolean("active");
 
     public List<Card> getAllByOwnerId(long ownerId) {
         // language=PostgreSQL
@@ -71,7 +70,7 @@ public class CardRepository {
         );
     }
 
-    public Optional<Card> createNewCard(long userId, String number) {
+    public Optional<Card> createNewCard(long userId, long number) {
         // language=PostgreSQL
         return jdbcTemplate.queryOne(
                 """
@@ -82,11 +81,11 @@ public class CardRepository {
         );
     }
 
-    public Optional<Boolean> blockById(long cardId) {
+    public Optional<Card> blockById(long cardId) {
         //language=PostgreSQL
         return jdbcTemplate.queryOne(
-                "UPDATE cards SET active = FALSE WHERE id = ? RETURNING active",
-                cardActiveRowMapper,
+                "UPDATE cards SET active = FALSE WHERE id = ? RETURNING id, number, balance",
+                cardRowMapper,
                 cardId
         );
     }
